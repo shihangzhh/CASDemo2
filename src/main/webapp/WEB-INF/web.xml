@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+
+    <!-- 登录认证过滤器-->
+
+    <filter>
+        <filter-name>CASFilter</filter-name>
+        <filter-class>org.jasig.cas.client.authentication.AuthenticationFilter</filter-class>
+        <!-- 配置cas server的服务器登录地址-->
+        <init-param>
+            <param-name>casServerLoginUrl</param-name>
+            <param-value>http://192.168.188.146:9100/cas/login</param-value>
+        </init-param>
+        <init-param>
+            <param-name>serverName</param-name>
+            <param-value>http://localhost:9002</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CASFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 凭证认证过滤器-->
+    <filter>
+        <filter-name>casValidationFilter</filter-name>
+        <filter-class>org.jasig.cas.client.validation.Cas20ProxyReceivingTicketValidationFilter</filter-class>
+        <init-param>
+            <param-name>casServerUrlPrefix</param-name>
+            <param-value>http://192.168.188.146:9100/cas</param-value>
+        </init-param>
+        <init-param>
+            <param-name>serverName</param-name>
+            <param-value>http://localhost:9002</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>casValidationFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 针对HttpServletRequest请求拦截-->
+    <filter>
+        <filter-name>CasHttpRequestFilter</filter-name>
+        <filter-class>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CasHttpRequestFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 获取认证服务器端端返回的 通过认证的凭据用户名 过滤器-->
+    <filter>
+        <filter-name>casLocalFilter</filter-name>
+        <filter-class>org.jasig.cas.client.util.AssertionThreadLocalFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>casLocalFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 配置退出登录 监听器-->
+    <listener>
+        <listener-class>org.jasig.cas.client.session.SingleSignOutHttpSessionListener</listener-class>
+    </listener>
+
+    <!-- 退出登录过滤器-->
+    <filter>
+        <filter-name>casSingOutFilter</filter-name>
+        <filter-class>org.jasig.cas.client.session.SingleSignOutFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>casSingOutFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+</web-app>
